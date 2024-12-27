@@ -1,5 +1,6 @@
 package com.springboot.sv.products.service;
 
+import com.springboot.sv.products.ProductsApplication;
 import com.springboot.sv.products.dto.GenericResponseDto;
 import com.springboot.sv.products.dto.ProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +25,17 @@ public class ProductServiceImpl implements ProductService{
             ProductDto[] products = restTemplate.getForObject(EXTERNAL_API_URL, ProductDto[].class);
             List<ProductDto> productDtoList = Arrays.asList(products);
 
-            return new GenericResponseDto<>(
-                    productDtoList,
-                    "Successfull operation.",
-                    200
-            );
+            return GenericResponseDto.<List<ProductDto>>builder()
+                    .data(productDtoList)
+                    .message("Successfull operation.")
+                    .status(200)
+                    .build();
         }catch (Exception e){
-            return new GenericResponseDto<>(
-                    null,
-                    "Error in operation.",
-                    500
-            );
+            return GenericResponseDto.<List<ProductDto>>builder()
+                    .data(null)
+                    .message("Error in operation.")
+                    .status(500)
+                    .build();
         }
     }
 
@@ -43,16 +44,18 @@ public class ProductServiceImpl implements ProductService{
         String newUrl = EXTERNAL_API_URL + "/"+ id;
 
         ProductDto productDto = restTemplate.getForObject(newUrl,ProductDto.class);
+
         if(productDto == null){
-            return new GenericResponseDto<>(
-                    null,
-                    "Product not found for ID: " + id,
-                    404
-            );
+            return  GenericResponseDto.<ProductDto>builder()
+                    .data(null)
+                    .message("Product not found for ID: " + id)
+                    .status(404)
+                    .build();
         }
-        return new GenericResponseDto<>(
-                productDto,
-                "Successfull operation.",
-                200);
+        return  GenericResponseDto.<ProductDto>builder()
+                .data(productDto)
+                .message("Successfull operation.")
+                .status(200)
+                .build();
     }
 }
