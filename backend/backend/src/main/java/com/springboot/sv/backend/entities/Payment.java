@@ -17,5 +17,5 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    private String status; // APPROVED, REJECTED
+    private String status; // APPROVED
 }
