@@ -1,0 +1,5 @@
+external:
+  api:
+    order: http://localhost:8082/api/v1/orders
+    payment: http://localhost:8082/api/v1/orders
+    product: http://localhost:8081/api/v1/products
