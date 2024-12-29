@@ -32,14 +32,6 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public GenericResponseDto<OrderResponseDto> createOrder(OrderDto orderRequest) {
 
-        if(orderRequest.getProduts() == null || orderRequest.getProduts().isEmpty() || orderRequest.getCustomer() == null ) {
-            logger.error("Error for order creation");
-            return GenericResponseDto.<OrderResponseDto>builder()
-                    .data(null)
-                    .message("Error for order creation")
-                    .status(HttpStatus.BAD_REQUEST.value())
-                    .build();
-        }
 
         Customer customer = customerRepository.findById(orderRequest.getCustomer()).orElse(null);
         if(customer == null){
@@ -47,7 +39,7 @@ public class OrderServiceImpl implements OrderService{
             return GenericResponseDto.<OrderResponseDto>builder()
                     .data(null)
                     .message("Error: Customer not found with ID " + orderRequest.getCustomer())
-                    .status(HttpStatus.BAD_REQUEST.value())
+                    .status(HttpStatus.NOT_FOUND.value())
                     .build();
         }
 
