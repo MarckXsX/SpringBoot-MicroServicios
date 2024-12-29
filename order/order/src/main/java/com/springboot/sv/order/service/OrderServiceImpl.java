@@ -1,6 +1,8 @@
 package com.springboot.sv.order.service;
 
 import com.springboot.sv.order.dto.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -17,6 +19,8 @@ import java.util.List;
 
 @Service
 public class OrderServiceImpl implements OrderService{
+
+    private  static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     @Value("${external.api.order}")
     private String externarUrlOrder;
@@ -35,7 +39,7 @@ public class OrderServiceImpl implements OrderService{
 
         for (OrderDetailDto product : orderRequest.getProduts()) {
             try {
-
+                logger.info("consuming product-service");
                 ResponseEntity<GenericResponseDto<ProductDto>> response = restTemplate.exchange(
                         externarUrlProduct + "/" + product.getProductId(),
                         HttpMethod.GET,
@@ -44,6 +48,8 @@ public class OrderServiceImpl implements OrderService{
                 );
 
                 GenericResponseDto<ProductDto> productResponse = response.getBody();
+
+                logger.info("Products successfully recovered: {}", productResponse.getData());
 
                 ProductDto productData = productResponse.getData();
 
@@ -55,6 +61,7 @@ public class OrderServiceImpl implements OrderService{
 
             } catch (HttpClientErrorException e) {
                 invalidProductIds.add(product.getProductId());
+                logger.error("error get product: {}", e.getResponseBodyAsString());
             }
         }
 
@@ -69,8 +76,10 @@ public class OrderServiceImpl implements OrderService{
         OrderDto orderDto = new OrderDto();
         orderDto.setCustomer(orderRequest.getCustomer());
         orderDto.setProduts(validProducts);
+        logger.info("creation of the orderDto: {}", orderDto);
 
         try {
+            logger.info("consuming banckend-createOrder");
             ResponseEntity<GenericResponseDto<OrderResponseDto>> response = restTemplate.exchange(
                     externarUrlOrder,
                     HttpMethod.POST,
@@ -79,6 +88,7 @@ public class OrderServiceImpl implements OrderService{
             );
             return response.getBody();
         }catch (HttpClientErrorException e){
+            logger.error("Error creating order: {}", e.getResponseBodyAsString());
             return GenericResponseDto.<OrderResponseDto>builder()
                     .data(null)
                     .message("Error creating order: " + e.getResponseBodyAsString())
