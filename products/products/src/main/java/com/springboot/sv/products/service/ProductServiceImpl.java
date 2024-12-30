@@ -6,6 +6,8 @@ import com.springboot.sv.products.dto.ProductDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,8 +17,10 @@ import java.util.List;
 @Service
 public class ProductServiceImpl implements ProductService{
 
+    @Value("${external.api.url}")
+    private  String externalApiUrl;
+
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
-    private static final String EXTERNAL_API_URL = "https://fakestoreapi.com/products";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -25,28 +29,28 @@ public class ProductServiceImpl implements ProductService{
     public GenericResponseDto<List<ProductDto>> getAllProducts() {
 
         try {
-            ProductDto[] products = restTemplate.getForObject(EXTERNAL_API_URL, ProductDto[].class);
+            ProductDto[] products = restTemplate.getForObject(externalApiUrl, ProductDto[].class);
             List<ProductDto> productDtoList = Arrays.asList(products);
 
             logger.info("Products successfully recovered: {}", productDtoList);
             return GenericResponseDto.<List<ProductDto>>builder()
                     .data(productDtoList)
                     .message("Successfull operation.")
-                    .status(200)
+                    .status(HttpStatus.OK.value())
                     .build();
         }catch (Exception e){
             logger.warn("Products  not found");
             return GenericResponseDto.<List<ProductDto>>builder()
                     .data(null)
                     .message("Error in operation.")
-                    .status(500)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .build();
         }
     }
 
     @Override
     public GenericResponseDto<ProductDto> getProductById(Long id) {
-        String newUrl = EXTERNAL_API_URL + "/"+ id;
+        String newUrl = externalApiUrl + "/"+ id;
 
         ProductDto productDto = restTemplate.getForObject(newUrl,ProductDto.class);
 
@@ -55,14 +59,14 @@ public class ProductServiceImpl implements ProductService{
             return  GenericResponseDto.<ProductDto>builder()
                     .data(null)
                     .message("Product not found for ID: " + id)
-                    .status(404)
+                    .status(HttpStatus.NOT_FOUND.value())
                     .build();
         }
         logger.info("Product successfully recovered: {}", productDto.getTitle());
         return  GenericResponseDto.<ProductDto>builder()
                 .data(productDto)
                 .message("Successfull operation.")
-                .status(200)
+                .status(HttpStatus.OK.value())
                 .build();
     }
 }

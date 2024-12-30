@@ -1,0 +1,3 @@
+external:
+  api:
+    url: https://fakestoreapi.com/products
