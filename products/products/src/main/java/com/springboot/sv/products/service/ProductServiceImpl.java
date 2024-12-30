@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService{
             logger.warn("Products  not found");
             return GenericResponseDto.<List<ProductDto>>builder()
                     .data(null)
-                    .message("Error in operation.")
+                    .message("Error in operation." + e.getMessage())
                     .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .build();
         }
@@ -52,21 +52,30 @@ public class ProductServiceImpl implements ProductService{
     public GenericResponseDto<ProductDto> getProductById(Long id) {
         String newUrl = externalApiUrl + "/"+ id;
 
-        ProductDto productDto = restTemplate.getForObject(newUrl,ProductDto.class);
+        ProductDto productDto = new ProductDto();
+        try {
+            productDto = restTemplate.getForObject(newUrl,ProductDto.class);
 
-        if(productDto == null){
-            logger.warn("Product with ID {} not found", id);
+            if(productDto == null){
+                logger.warn("Product with ID {} not found", id);
+                return  GenericResponseDto.<ProductDto>builder()
+                        .data(null)
+                        .message("Product not found for ID: " + id)
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .build();
+            }
+            logger.info("Product successfully recovered: {}", productDto.getTitle());
+            return  GenericResponseDto.<ProductDto>builder()
+                    .data(productDto)
+                    .message("Successfull operation.")
+                    .status(HttpStatus.OK.value())
+                    .build();
+        }catch (Exception e){
             return  GenericResponseDto.<ProductDto>builder()
                     .data(null)
-                    .message("Product not found for ID: " + id)
-                    .status(HttpStatus.NOT_FOUND.value())
+                    .message("Error in operation." + e.getMessage())
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .build();
         }
-        logger.info("Product successfully recovered: {}", productDto.getTitle());
-        return  GenericResponseDto.<ProductDto>builder()
-                .data(productDto)
-                .message("Successfull operation.")
-                .status(HttpStatus.OK.value())
-                .build();
     }
 }
