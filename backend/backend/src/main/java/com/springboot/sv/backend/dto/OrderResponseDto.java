@@ -1,7 +1,6 @@
 package com.springboot.sv.backend.dto;
 
 import com.springboot.sv.backend.entities.OrderDetail;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;

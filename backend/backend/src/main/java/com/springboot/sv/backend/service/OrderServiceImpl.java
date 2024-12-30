@@ -32,7 +32,6 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public GenericResponseDto<OrderResponseDto> createOrder(OrderDto orderRequest) {
 
-
         Customer customer = customerRepository.findById(orderRequest.getCustomer()).orElse(null);
         if(customer == null){
             logger.error("Error: Customer with ID {} not found", orderRequest.getCustomer());
@@ -45,7 +44,7 @@ public class OrderServiceImpl implements OrderService{
 
         Order order = new Order();
         order.setCustomer(customer);
-        order.setCreatedAt(new Date());
+        order.setCreatedAt( new Date());
 
         logger.info("Mapping product details for the order");
         List<OrderDetail> details = orderRequest.getProduts().stream()
@@ -77,13 +76,4 @@ public class OrderServiceImpl implements OrderService{
                 .build();
     }
 
-    @Override
-    public Order getOrderById(Long id) {
-        return orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
-    }
-
-    @Override
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
-    }
 }
