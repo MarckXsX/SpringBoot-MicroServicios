@@ -2,6 +2,7 @@ package com.springboot.sv.backend.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 import java.util.List;
@@ -16,6 +17,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
+    @ToString.Exclude
     private Customer customer;
 
     private Double totalAmount;
@@ -23,8 +25,10 @@ public class Order {
     private Date createdAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<OrderDetail> orderDetails;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private Payment payment;
 }

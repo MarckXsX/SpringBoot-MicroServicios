@@ -3,6 +3,7 @@ package com.springboot.sv.backend.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -15,6 +16,7 @@ public class Payment {
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "order_id")
+    @ToString.Exclude
     private Order order;
 
     private String status; // APPROVED
