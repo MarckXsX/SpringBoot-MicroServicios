@@ -10,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -39,12 +41,12 @@ public class ProductServiceImpl implements ProductService{
                     new ParameterizedTypeReference<GenericResponseDto<?>>() {}
             );
             return response.getBody();
-        }catch (HttpClientErrorException e){
-            logger.error("Error in operation: {}", e.getResponseBodyAsString());
+        }catch (Exception e){
+            logger.error("Error in operation: {}", e.getMessage());
             return GenericResponseDto.<ProductDto>builder()
                     .data(null)
-                    .message("Error in operation: " + e.getResponseBodyAsString())
-                    .status(e.getStatusCode().value())
+                    .message("Error in operation: " + e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST.value())
                     .build();
         }
     }
@@ -60,12 +62,12 @@ public class ProductServiceImpl implements ProductService{
                     new ParameterizedTypeReference<GenericResponseDto<ProductDto>>() {}
             );
             return response.getBody();
-        }catch (HttpClientErrorException e){
-            logger.error("Error in operation: {}", e.getResponseBodyAsString());
+        }catch (Exception e){
+            logger.error("Error in operation: {}", e.getMessage());
             return GenericResponseDto.<ProductDto>builder()
                     .data(null)
-                    .message("Error in operation: " + e.getResponseBodyAsString())
-                    .status(e.getStatusCode().value())
+                    .message("Error in operation: " + e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST.value())
                     .build();
         }
     }

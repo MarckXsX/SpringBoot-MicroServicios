@@ -59,9 +59,9 @@ public class OrderServiceImpl implements OrderService{
                 validProduct.setPrice(productData.getPrice());
                 validProducts.add(validProduct);
 
-            } catch (HttpClientErrorException e) {
+            } catch (Exception e) {
                 invalidProductIds.add(product.getProductId());
-                logger.error("error get product: {}", e.getResponseBodyAsString());
+                logger.error("error get product: {}", e.getMessage());
             }
         }
 
